@@ -1,7 +1,7 @@
 const cardsOfFriends = document.getElementById("allHumans");
 const searchBar = document.getElementById("search");
 const filterMenu = document.getElementById("filter_menu");
-const URL = "https://randomuser.me/api/?results=2";
+const URL = "https://randomuser.me/api/?results=10";
 let friends;
 
 function startApp() {
