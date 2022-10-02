@@ -3,8 +3,8 @@ const searchBar = document.getElementById("search");
 const filterMenu = document.getElementById("filter_menu");
 const checkboxesGender = document.querySelector(".gender_checkbox");
 let friends;
-// let filteredUsers;
-// let searchedFriend;
+let search;
+let friendsCopy;
 function startApp() {
   const URL = "https://randomuser.me/api?results=10";
   fetch(URL)
@@ -13,11 +13,11 @@ function startApp() {
     .then((users) => {
       friends = users.results;
       displayUsers(friends);
-      searchFriends(friends);
+      // searchFriends(friends);
 
-      filterMenu.addEventListener("click", (event) => {
-        setFilters(event, friends);
-      });
+      // filterMenu.addEventListener("click", (event) => {
+      //   setFilters(event, friends);
+      // });
     });
   // .catch((error) => {
   //   return error.message;
@@ -31,11 +31,11 @@ function handleErrors(response) {
 }
 
 function setFilters({ target }, friends) {
-  if (target.closest(".filter_sort")) {
-    const sortedResults = sortFriends(target, friends);
-    displayUsers(sortedResults);
-    filterByGender(sortedResults);
-  }
+  // if (target.closest(".filter_sort")) {
+  const sortedResults = sortFriends(target, friends);
+  displayUsers(sortedResults);
+  // filterByGender(sortedResults);
+  // }
 }
 
 function displayUsers(friends) {
@@ -43,12 +43,12 @@ function displayUsers(friends) {
     .map((item) => {
       return `
     <div class="card_person">
-    <div class="card_container">
-    <img src="${item.picture.large}">
-    <h3 class="card_name">${item.name.first} ${item.name.last}</h3>
-    <p class="card_age">Age: ${item.dob.age}</p>
-    <p class="card_gender">Gender: ${item.gender}</p>
-    </div>
+      <div class="card_container">
+        <img src="${item.picture.large}">
+        <h3 class="card_name">${item.name.first} ${item.name.last}</h3>
+        <p class="card_age">Age: ${item.dob.age}</p>
+        <p class="card_gender">Gender: ${item.gender}</p>
+      </div>
     </div>`;
     })
     .join("");
@@ -80,6 +80,8 @@ function sortFriends(target, friends) {
 
       break;
   }
+  friends = filterByGender(friends);
+  friends = searchFriends(friends);
   return friends;
 }
 function sortByAge(a, b) {
@@ -91,24 +93,40 @@ function filterByGender(friends) {
     document.querySelectorAll(".gender_checkbox:checked")
   );
   let filteredUsers = friends.filter((item) =>
-    checkboxes.some((gender) => item.gender === gender.value)
+    checkboxes.some((gender) =>item.gender === gender.value)
+    console.log(gender.value)
   );
-  console.log(filteredUsers);
-  displayUsers(filteredUsers);
-  searchFriends(filteredUsers);
+  // displayUsers(filteredUsers);
+  // searchFriends(filteredUsers);
+  return filteredUsers;
 }
 
 function searchFriends(friends) {
-  searchBar.addEventListener("input", (e) => {
-    const search = e.target.value.toLowerCase();
-    let searchedFriend = friends.filter((item) => {
-      const { first: firstName, last: lastName } = item.name;
-      return `${firstName} ${lastName}`.toLowerCase().includes(search);
-    });
-    displayUsers(searchedFriend);
-    // filterByGender(searchedFriend);
-    console.log(searchedFriend);
-    // filterByGender(searchedFriend);
+  if (search === "" || search === undefined) return friends;
+  let searchedFriend = friends.filter((item) => {
+    const { first: firstName, last: lastName } = item.name;
+    return `${firstName} ${lastName}`.toLowerCase().includes(search);
   });
+  return searchedFriend;
+  // searchBar.addEventListener("input", (e) => {
+  //   search = e.target.value.toLowerCase();
+  //   let searchedFriend = friends.filter((item) => {
+  //     const { first: firstName, last: lastName } = item.name;
+  //     return `${firstName} ${lastName}`.toLowerCase().includes(search);
+  //   });
+  //   displayUsers(searchedFriend);
+  //   // filterByGender(searchedFriend);
+  //   console.log(searchedFriend);
+  //   // filterByGender(searchedFriend);
+  // });
 }
+filterMenu.addEventListener("click", (event) => {
+  friendsCopy = [...friends];
+  setFilters(event, friendsCopy);
+});
+searchBar.addEventListener("input", (event) => {
+  friendsCopy = [...friends];
+  search = event.target.value.toLowerCase();
+  setFilters(event, friendsCopy);
+});
 startApp();
